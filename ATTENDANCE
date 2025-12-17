@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Attendance | Fergusson College</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      background:
+        linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+        url("https://fergusson.managementquotainfo.in/wp-content/uploads/sites/4/2019/12/fergusson.jpg");
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+
+    .card {
+      width: 360px;
+      padding: 30px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-bottom: 25px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 15px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #6a1b9a, #283593);
+      color: white;
+    }
+
+    .btn.secondary {
+      background: linear-gradient(135deg, #37474f, #263238);
+    }
+
+    .status {
+      margin-top: 18px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #e1bee7;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 11px;
+      opacity: 0.75;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <h2>📚 Mark Attendance</h2>
+    <div class="subtitle">Fergusson College — BSc Data Science</div>
+
+    <input id="roll" placeholder="Enter Roll Number">
+
+    <button class="btn secondary" onclick="alert('QR Scanned')">
+       Scan QR
+    </button>
+
+    <button class="btn secondary" onclick="alert('Gemini insights obtained')">
+       Gemini Insights
+    </button>
+
+    <button class="btn" onclick="submitAttendance()">
+       Mark Attendance
+    </button>
+
+    <div class="status" id="status"></div>
+
+    <div class="footer">
+      Smart Attendance System 
+    </div>
+  </div>
+
+<script>
+function submitAttendance() {
+  var roll = document.getElementById("roll").value;
+
+  if (!roll) {
+    document.getElementById("status").innerText = "⚠ Please enter roll number";
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(function(msg) {
+      document.getElementById("status").innerText = msg;
+    })
+    .markAttendance(roll);
+}
+</script>
+
+</body>
+</html>
