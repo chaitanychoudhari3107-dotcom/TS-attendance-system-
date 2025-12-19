@@ -1,0 +1,173 @@
+function doGet(e) {
+  var page = e.parameter.page;
+
+  if (page === "teacher") {
+    return HtmlService.createHtmlOutput(teacherHTML());
+  } else {
+    return HtmlService.createHtmlOutput(studentHTML());
+  }
+}
+
+
+
+function markAttendance(roll) {
+  var ss = SpreadsheetApp.getActive();
+  var master = ss.getSheetByName("Teacher");
+  var logs = ss.getSheetByName("Logs");
+
+  var subject = "Data Science";
+  var date = new Date();
+
+  master.appendRow([roll, date, subject, "Present"]);
+  logs.appendRow([new Date(), "Attendance Marked", roll]);
+
+  return " Attendance marked successfully!";
+}
+
+
+
+function getAttendanceData() {
+  var sheet = SpreadsheetApp.getActive().getSheetByName("Master");
+  return sheet.getDataRange().getValues();
+}
+
+function updateStatus(row, status) {
+  var sheet = SpreadsheetApp.getActive().getSheetByName("Master");
+  sheet.getRange(row, 4).setValue(status);
+}
+
+
+
+function studentHTML() {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Attendance</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    
+    .card {
+      background: white;
+      padding: 30px;
+      width: 320px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 95%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .status {
+      margin-top: 15px;
+      color: purple;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2> Student Attendance</h2>
+    <input id="roll" placeholder="Enter Roll Number">
+
+    <button onclick="alert('QR scanned!')"> Scan QR</button>
+    <button onclick="alert('Gemini Insights obtained!')"> Obtain Gemini Insights</button>
+    <button onclick="submitAttendance()"> Submit</button>
+
+    <div class="status" id="status"></div>
+  </div>
+
+<script>
+function submitAttendance() {
+  var roll = document.getElementById("roll").value;
+  if (!roll) {
+    alert("Enter roll number");
+    return;
+  }
+
+  google.script.run.withSuccessHandler(function(msg) {
+    document.getElementById("status").innerText = msg;
+  }).markAttendance(roll);
+}
+</script>
+
+</body>
+</html>
+`;
+}
+
+
+
+function teacherHTML() {
+  var data = getAttendanceData();
+  var rows = "";
+
+  for (var i = 1; i < data.length; i++) {
+    rows += `
+      <tr>
+        <td>${data[i][0]}</td>
+        <td>${data[i][1]}</td>
+        <td>${data[i][2]}</td>
+        <td>
+          <select onchange="updateStatus(${i + 1}, this.value)">
+            <option ${data[i][3]=="Present"?"selected":""}>Present</option>
+            <option ${data[i][3]=="Absent"?"selected":""}>Absent</option>
+          </select>
+        </td>
+      </tr>
+    `;
+  }
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teacher Dashboard</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #4CAF50; color: white; }
+  </style>
+</head>
+
+<body>
+  <h2> Teacher Attendance Dashboard</h2>
+
+  <table>
+    <tr>
+      <th>Roll</th>
+      <th>Date</th>
+      <th>Subject</th>
+      <th>Status</th>
+    </tr>
+    ${rows}
+  </table>
+
+<script>
+function updateStatus(row, status) {
+  google.script.run.updateStatus(row, status);
+}
+</script>
+
+</body>
+</html>
+`;
+}
