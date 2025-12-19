@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Scanner | Attendance</title>
+
+  
+  <script src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjBfpqyeDaMnFlLmNVzG7xO24XqK3F_b5aeQ&s"></script>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+
+    .card {
+      width: 360px;
+      padding: 25px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      opacity: 0.8;
+      margin-bottom: 15px;
+    }
+
+    #reader {
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .result {
+      margin-top: 15px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #ce93d8;
+      word-break: break-word;
+    }
+
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #6a1b9a, #283593);
+      color: white;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <h2> Scan QR Code</h2>
+    <div class="subtitle">Scan QR to mark your attendance</div>
+
+    <div id="reader"></div>
+
+    <div class="result" id="result">
+      Displaying QR code
+    </div>
+
+    <button onclick="stopScanner()">Stop Camera</button>
+  </div>
+
+<script>
+  const resultElement = document.getElementById("result");
+  let html5Qr;
+
+  function onScanSuccess(decodedText) {
+    resultElement.innerText = " QR Scanned: " + decodedText;
+
+    
+    html5Qr.stop();
+  }
+
+  function onScanFailure(error) {
+    
+  }
+
+  function startScanner() {
+    html5Qr = new Html5Qrcode("reader");
+    html5Qr.start(
+      { facingMode: "environment" },
+      {
+        fps: 10,
+        qrbox: 250
+      },
+      onScanSuccess,
+      onScanFailure
+    );
+  }
+
+  function stopScanner() {
+    if (html5Qr) {
+      html5Qr.stop().then(() => {
+        resultElement.innerText = "Camera stopped.";
+      });
+    }
+  }
+
+  
+  startScanner();
+</script>
+
+</body>
+</html>
